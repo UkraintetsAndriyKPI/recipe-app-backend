@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from recipes.admin_inlines import RecipeCategoriesInline, RecipeTagsInline
+from recipes.admin_inlines import RecipeCategoriesInline, RecipeTagsInline, RecipeStepInline
 
 from .models import DailyRecipe, Tag, Categories, Recipe
 
@@ -12,7 +12,7 @@ class RecipeAdmin(admin.ModelAdmin):
     list_filter = ("categories", "tags")
     ordering = ("-id",)
 
-    inlines = [RecipeCategoriesInline, RecipeTagsInline]
+    inlines = [RecipeCategoriesInline, RecipeTagsInline, RecipeStepInline]
 
 @admin.register(Categories)
 class CategoryAdmin(admin.ModelAdmin):
