@@ -1,5 +1,3 @@
-from argparse import Action
-from django.shortcuts import render
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework import viewsets, status
@@ -35,6 +33,17 @@ class RecipeViewSet(viewsets.ModelViewSet):
         latest_daily = DailyRecipe.objects.filter(recipe__is_published=True).order_by('-date')[:3]
         recipes = [d.recipe for d in latest_daily]
         serializer = self.get_serializer(recipes, many=True)
+        return Response(serializer.data)
+
+    @action(detail=True, methods=['get'], url_path='steps')
+    def get_steps(self, request, pk=None):
+        """
+        Returns the steps for a specific recipe
+        """
+        recipe = self.get_object()
+        steps = recipe.recipestep_set.all().order_by('step_number')
+        from .serializers import RecipeStepSerializer
+        serializer = RecipeStepSerializer(steps, many=True)
         return Response(serializer.data)
 
 class CategoriesViewSet(viewsets.ModelViewSet):
