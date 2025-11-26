@@ -3,5 +3,5 @@ from .jobs import gen_day_recipes
 
 def start():
     scheduler = BackgroundScheduler()
-    scheduler.add_job(gen_day_recipes, 'interval', min=10)
+    scheduler.add_job(gen_day_recipes, 'interval', minutes=10)
     scheduler.start()
