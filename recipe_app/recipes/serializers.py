@@ -1,8 +1,13 @@
 # serializers.py
 from rest_framework import serializers
 
-from .models import Tag, Categories
+from .models import Recipe, Tag, Categories
 
+
+class RecipeSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Recipe
+        fields = '__all__'
 
 class CategoriesSerializer(serializers.ModelSerializer):
     class Meta:
