@@ -5,7 +5,7 @@ from django.db import models
 
 
 # Recipes model implementation
-class Recipes(models.Model):
+class Recipe(models.Model):
     id = models.AutoField(primary_key=True)
     title = models.CharField(max_length=100, unique=True, null=False, db_index=True)
     description = models.TextField(null=True, blank=True)
@@ -25,7 +25,7 @@ class Recipes(models.Model):
 # Categories model implementation
 class RecipeCategories(models.Model):
     id = models.AutoField(primary_key=True)
-    recipe_id = models.ForeignKey('Recipes', on_delete=models.CASCADE, null=False)
+    recipe_id = models.ForeignKey('Recipe', on_delete=models.CASCADE, null=False)
     category_id = models.ForeignKey('Categories', on_delete=models.CASCADE, null=False)
 
     def __str__(self):
@@ -39,10 +39,11 @@ class Categories(models.Model):
     def __str__(self):
         return f'{self.id} - {self.category_name}'
 
+
 # Recipe model implementation
 class RecipeTags(models.Model):
     id = models.AutoField(primary_key=True)
-    recipe_id = models.ForeignKey('Recipes', on_delete=models.CASCADE, null=False)
+    recipe_id = models.ForeignKey('Recipe', on_delete=models.CASCADE, null=False)
     tag_id = models.ForeignKey('Tag', on_delete=models.CASCADE, null=False)
 
     def __str__(self):
@@ -55,3 +56,13 @@ class Tag(models.Model):
 
     def __str__(self):
         return self.name
+
+
+# DailyRecipe model implementation
+class DailyRecipe(models.Model):
+    id = models.AutoField(primary_key=True)
+    date = models.DateField(db_index=True, null=False)
+    recipe = models.ForeignKey('Recipe', on_delete=models.CASCADE)
+
+    def __str__(self):
+        return f"{self.date}: {self.recipe.id} - {self.recipe.title}"
