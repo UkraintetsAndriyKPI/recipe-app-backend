@@ -1,8 +1,15 @@
 # serializers.py
 from rest_framework import serializers
 
-from .models import Recipe, RecipeStep, Tag, Categories
+from .models import Recipe, RecipeStep, Tag, Categories, RecipeIngredient
 
+
+class RecipeIngredientSerializer(serializers.ModelSerializer):
+    ingredient_name = serializers.CharField(source='ingredient.name', read_only=True)
+    unit = serializers.CharField(source='ingredient.unit', read_only=True)
+    class Meta:
+        model = RecipeIngredient
+        fields = ('ingredient_name', 'quantity', 'unit', 'position')
 
 class CategoriesSerializer(serializers.ModelSerializer):
     class Meta:

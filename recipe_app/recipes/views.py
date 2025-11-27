@@ -4,7 +4,8 @@ from rest_framework import viewsets, status
 from django.db.models import Q
 
 from .models import DailyRecipe, Recipe, Categories, Tag
-from .serializers import RecipeSerializer, CategoriesSerializer, TagSerializer
+from .serializers import (RecipeSerializer, RecipeIngredientSerializer,
+                          CategoriesSerializer, TagSerializer)
 
 
 class RecipeViewSet(viewsets.ModelViewSet):
@@ -45,6 +46,13 @@ class RecipeViewSet(viewsets.ModelViewSet):
         steps = recipe.recipestep_set.all().order_by('step_number')
         from .serializers import RecipeStepSerializer
         serializer = RecipeStepSerializer(steps, many=True)
+        return Response(serializer.data)
+
+    @action(detail=True, methods=['get'], url_path='ingredients')
+    def get_ingredients(self, request, pk=None):
+        recipe = self.get_object()
+        ingredients = recipe.ingredient_links.all().order_by('position')
+        serializer = RecipeIngredientSerializer(ingredients, many=True)
         return Response(serializer.data)
 
     @action(detail=False, methods=['get'], url_path='filter')
