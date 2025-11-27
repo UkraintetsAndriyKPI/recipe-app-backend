@@ -1,6 +1,7 @@
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework import viewsets, status
+from django.db.models import Q
 
 from .models import DailyRecipe, Recipe, Categories, Tag
 from .serializers import RecipeSerializer, CategoriesSerializer, TagSerializer
@@ -50,22 +51,40 @@ class RecipeViewSet(viewsets.ModelViewSet):
     def filter_recipes(self, request):
         """
         Filter recipes by multiple tags and categories.
-        Example: /recipes/filter/?tag=1,3&category=2,5
+        Example: /recipes/filter/?tag=1,3&category=2&min_time=10&max_time=30&search=soup
         """
         queryset = Recipe.objects.filter(is_published=True)
 
+        # Tag and Category filters
         tag_param = request.GET.get("tag")
         category_param = request.GET.get("category")
 
-        # Multiple tags
         if tag_param:
             tag_ids = [int(i) for i in tag_param.split(",") if i.isdigit()]
             queryset = queryset.filter(tags__id__in=tag_ids)
 
-        # Multiple categories
         if category_param:
             category_ids = [int(i) for i in category_param.split(",") if i.isdigit()]
             queryset = queryset.filter(categories__id__in=category_ids)
+
+        # Cooking time filter
+        min_time = request.GET.get("min_time")
+        max_time = request.GET.get("max_time")
+
+        if min_time and min_time.isdigit():
+            queryset = queryset.filter(cooking_time_min__gte=int(min_time))
+
+        if max_time and max_time.isdigit():
+            queryset = queryset.filter(cooking_time_min__lte=int(max_time))
+
+        # Search filter
+        search = request.GET.get("search")
+
+        if search:
+            queryset = queryset.filter(
+                Q(title__icontains=search) |
+                Q(description__icontains=search)
+            )
 
         queryset = queryset.distinct()
 
