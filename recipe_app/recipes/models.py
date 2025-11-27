@@ -1,9 +1,6 @@
 from django.db import models
 
 
-
-
-
 # Recipes model implementation
 class Recipe(models.Model):
     id = models.AutoField(primary_key=True)
@@ -11,6 +8,9 @@ class Recipe(models.Model):
     description = models.TextField(null=True, blank=True)
     instructions = models.TextField(null=True, blank=True)
     cooking_time_min = models.IntegerField(null=False)
+    servings = models.IntegerField()
+    difficulty = models.CharField(max_length=50, null=True, blank=True)
+
 
     creation_date = models.DateTimeField(auto_now_add=True)
     update_date = models.DateTimeField(auto_now=True)
@@ -26,6 +26,30 @@ class Recipe(models.Model):
     def __str__(self):
         return f'{self.id} - {self.title}'
 
+# Ingredients model implementation
+class RecipeIngredient(models.Model):
+    recipe = models.ForeignKey('Recipe', on_delete=models.CASCADE,
+                               related_name='ingredient_links')
+    ingredient = models.ForeignKey('Ingredient', on_delete=models.CASCADE,
+                                   related_name='recipe_links')
+    quantity = models.CharField(max_length=100)
+    position = models.IntegerField(null=True, blank=True)
+
+    class Meta:
+        ordering = ['position']
+
+    def __str__(self):
+        return f"{self.recipe.title} - {self.ingredient.name}"
+
+class Ingredient(models.Model):
+    id = models.AutoField(primary_key=True)
+    name = models.CharField(max_length=150, unique=True)
+    unit = models.CharField(max_length=50, null=True, blank=True)
+    calories_per_100g = models.FloatField(null=True, blank=True)
+
+    def __str__(self):
+        return self.name
+
 # Steps model implementation
 class RecipeStep(models.Model):
     id = models.AutoField(primary_key=True)
@@ -36,6 +60,7 @@ class RecipeStep(models.Model):
     def __str__(self):
         return f'{self.recipe_id} - Step {self.step_number}'
 
+
 # Categories model implementation
 class RecipeCategories(models.Model):
     id = models.AutoField(primary_key=True)
@@ -44,7 +69,6 @@ class RecipeCategories(models.Model):
 
     def __str__(self):
         return f'{self.id} - {self.category_id}'
-
 
 class Categories(models.Model):
     id = models.AutoField(primary_key=True)
@@ -66,7 +90,6 @@ class RecipeTags(models.Model):
 
     def __str__(self):
         return f'{self.recipe_id} - {self.tag_id}'
-
 
 class Tag(models.Model):
     id = models.AutoField(primary_key=True)
