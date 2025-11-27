@@ -46,6 +46,32 @@ class RecipeViewSet(viewsets.ModelViewSet):
         serializer = RecipeStepSerializer(steps, many=True)
         return Response(serializer.data)
 
+    @action(detail=False, methods=['get'], url_path='filter')
+    def filter_recipes(self, request):
+        """
+        Filter recipes by multiple tags and categories.
+        Example: /recipes/filter/?tag=1,3&category=2,5
+        """
+        queryset = Recipe.objects.filter(is_published=True)
+
+        tag_param = request.GET.get("tag")
+        category_param = request.GET.get("category")
+
+        # Multiple tags
+        if tag_param:
+            tag_ids = [int(i) for i in tag_param.split(",") if i.isdigit()]
+            queryset = queryset.filter(tags__id__in=tag_ids)
+
+        # Multiple categories
+        if category_param:
+            category_ids = [int(i) for i in category_param.split(",") if i.isdigit()]
+            queryset = queryset.filter(categories__id__in=category_ids)
+
+        queryset = queryset.distinct()
+
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data)
+
 class CategoriesViewSet(viewsets.ModelViewSet):
     queryset = Categories.objects.all()
     serializer_class = CategoriesSerializer
