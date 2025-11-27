@@ -1,5 +1,14 @@
+import os
 from django.db import models
+from django.utils.text import slugify
 
+
+# Function to generate unique file path for recipe images
+def recipe_image_upload_to(instance, filename):
+    base, ext = os.path.splitext(filename)
+    recipe_slug = slugify(instance.title)
+    new_filename = f"{recipe_slug}_{base}{ext}"
+    return os.path.join('recipe_images', new_filename)
 
 # Recipes model implementation
 class Recipe(models.Model):
@@ -17,7 +26,7 @@ class Recipe(models.Model):
 
     is_published = models.BooleanField(default=False, db_index=True)
 
-    image = models.ImageField(upload_to='recipe_images/', null=True, blank=True)
+    image = models.ImageField(upload_to=recipe_image_upload_to, null=True, blank=True)
 
 
     categories = models.ManyToManyField("Categories", through="RecipeCategories")
