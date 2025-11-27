@@ -3,9 +3,14 @@ from rest_framework.response import Response
 from rest_framework import viewsets, status
 from django.db.models import Q
 
-from .models import DailyRecipe, Recipe, Categories, Tag
-from .serializers import (RecipeSerializer, RecipeIngredientSerializer,
-                          CategoriesSerializer, TagSerializer)
+from .models import Categories, DailyRecipe, Recipe, Tag
+from .serializers import (
+    CategoriesSerializer,
+    RecipeIngredientSerializer,
+    RecipeSerializer,
+    RecipeStepSerializer,
+    TagSerializer,
+)
 
 
 class RecipeViewSet(viewsets.ModelViewSet):
@@ -44,7 +49,6 @@ class RecipeViewSet(viewsets.ModelViewSet):
         """
         recipe = self.get_object()
         steps = recipe.recipestep_set.all().order_by('step_number')
-        from .serializers import RecipeStepSerializer
         serializer = RecipeStepSerializer(steps, many=True)
         return Response(serializer.data)
 
