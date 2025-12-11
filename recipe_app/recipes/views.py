@@ -16,6 +16,8 @@ from .serializers import (
 class RecipeViewSet(viewsets.ModelViewSet):
     queryset = Recipe.objects.filter(is_published=True)
     serializer_class = RecipeSerializer
+    ordering_fields = ['creation_date', 'title']
+    ordering = ['-creation_date']
 
     @action(detail=False, methods=['get'], url_path='all-recipes')
     def all_recipes(self, request):
